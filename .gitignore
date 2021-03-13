@@ -1,0 +1,7 @@
+
+
+# Eviroments
+.env
+.venv
+env/
+venv/
