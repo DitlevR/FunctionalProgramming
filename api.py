@@ -24,6 +24,29 @@ mysql = MySQL(app)
 #api = Api(app)
 
 
+class Project:
+	def __init__(self, id, title, duration):
+		self.id = id
+		self.title = title
+		self.duration = duration
+
+class Employee:
+	def __init__(self, id, firstName, lastName, email):
+		self.id = id
+		self.firstName = firstName
+		slef.lastName = lastName
+		slef.email = email
+
+class Department:
+	def __init__(self, code, name, description):
+		slef.code = code
+		self.name = name
+		self.description = description 
+
+
+
+
+
 @app.route('/', methods= ['GET'])
 def home():
 	return"<h1>Hello world"
