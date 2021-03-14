@@ -1,10 +1,8 @@
-from flask import Flask
+from flask import Flask, render_template, request, redirect
 #from flask_sqlalchemy import SQLAlchemy 
 from flaskext.mysql import MySQL
 import yaml
-#from flask_restful import Resource, Api, reqparse
-#import pandas as pd
-#import ast
+
 
 
 app = Flask(__name__)
@@ -44,15 +42,21 @@ class Department:
 		self.description = description 
 
 
-
-
-
 @app.route('/', methods= ['GET'])
 def home():
 	return"<h1>Hello world"
 
+@app.route('/allemp', methods=['GET'])
+def allemp():
+	cur = mysql.get_db().cursor()
+	resultValue = cur.execute("SELECT * FROM employee")
+	if resultValue > 0:
+		emp = cur.fetchall()
+		print(emp)
+		return emp
+
 if __name__ == '__main__':
-	app.run()
+	app.run(debug=True)
 
 
 
