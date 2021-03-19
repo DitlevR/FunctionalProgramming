@@ -1,24 +1,23 @@
 from flask import Flask, render_template, request, redirect
-#from flask_sqlalchemy import SQLAlchemy 
-from flaskext.mysql import MySQL
+from flask_sqlalchemy import SQLAlchemy 
+#from flaskext.mysql import MySQL
 import yaml
 
 
 
 app = Flask(__name__)
 
+#mysql = MySQL()
 #db config
-db = yaml.load(open('db.yaml'))
-app.config['MYSQL_HOST'] = db['mysql_host']
-app.config['MYSQL_USER'] = db['mysql_user']
-app.config['MYSQL_PASSWORD'] = db['mysql_password']
-app.config['MYSQL_DB'] = db['mysql_db']
+#db = yaml.load(open('db.yaml'))
+#app.config['MYSQL_HOST'] = '46.101.167.169'
+#app.config['MYSQL_USER'] = db['mysql_user']
+#app.config['MYSQL_PASSWORD'] = db['mysql_password']
+#app.config['MYSQL_DB'] = db['mysql_db']
 
-mysql = MySQL(app)
-
-
-
-#db = SQLAlchemy(app)
+#mysql.init_app(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://funk_user:funkyfunk950318@46.101.167.169/funk'
+db = SQLAlchemy(app)
 #api = Api(app)
 
 
