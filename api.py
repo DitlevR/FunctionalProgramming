@@ -36,19 +36,23 @@ class HelloWorld(Resource):
 api.add_resource(HelloWorld, '/hello')
 
 
+projects = db.Table('projects',
+                    db.Column('project_id', db.Integer, db.ForeignKey(
+                        'project.id'), primary_key=True),
+                    db.Column('employee_id', db.Integer, db.ForeignKey('employee.id')), primary_key=True)
+
+
 class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'),
-                            nullable=False)
 
 
 class Employee(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    projects = db.relationship('Project', backref='employee', lazy=True)
-    departments = db.relationship('Department', backref='employee', lazy=True)
+    projects = db.relationship('Project', secondary=projects, lazy='subquery',
+                               backref=db.backref('employees', lazy=True))
 
     def __init__(self, name, email):
         self.name = name
@@ -62,8 +66,6 @@ class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(200), unique=True, nullable=True)
-    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'),
-                            nullable=False)
 
 
 @app.route('/', methods=['GET'])
@@ -81,5 +83,15 @@ def employees():
 
 
 if __name__ == '__main__':
+
     db.create_all()
+    project = Project("run")
+    db.session.add(project)
+    db.session.commit()
+    # e=Employee("Hans", "hans@mail.dk")
+    # d=Deparment
+
+    # db.session.add(e)
+    # db.session.commit()
+
     app.run()
