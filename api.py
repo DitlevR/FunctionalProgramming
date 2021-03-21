@@ -83,11 +83,11 @@ class Department(db.Model):
         self.description = desc
 
 
-class EmployeeData(ma.Schema):
-    class Meta:
-        field = ("id", "name", "email")
-        model = Employee
-
+"""class EmployeeData(ma.Schema):
+#    class Meta:
+#        field = ("id", "name", "email")
+#        model = Employee
+#
     em_schema = EmployeeData()
     ems_schema = EmployeeData(many=True)
 
@@ -99,6 +99,7 @@ class Hello(Resource):
 
 
 api.add_resource(Hello, '/hello')
+"""
 
 
 @app.route('/', methods=['GET'])
@@ -120,17 +121,17 @@ def employees():
 @app.route('/employee/<id>', methods=['GET'])
 def employeeById(id):
     em = Employee.query.filter_by(id=id).first_or_404()
-    return str(Employee.as_dict(em))
+    return json.dumps(Employee.as_dict(em))
 
 
 @app.route('/department/<departmentname>', methods=['GET'])
 def EmInDep(departmentname):
     all = Employee.query.join(Department).filter(
         Department.name == departmentname).all()
-    names = []
+    em = ""
     for p in all:
-        names.append(Employee.as_dict(p))
-    return str(names)
+        em = em + json.dumps(p)
+    return em
 
 
 if __name__ == '__main__':
