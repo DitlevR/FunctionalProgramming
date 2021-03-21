@@ -3,7 +3,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Browser
 import Http 
-import Json.Decode exposing (Decoder, string, field, map3, at)
+import Json.Decode exposing (Decoder, string, field, map3, at, int)
 
 main = Browser.element
     { init = init
@@ -13,7 +13,8 @@ main = Browser.element
     }
 
 type alias Employee =
- { name: String
+ { id: Int
+ , name: String
  , email: String
  }
 
@@ -97,7 +98,7 @@ getSingleEmp = Http.get
 empDecoder : Decoder Employee {- Decoder afleverer en decoder der decoder en Employee-}
 empDecoder = 
   map3 Employee
-    (at ["id"] string)
+    (at ["id"] int)
     (at ["name"] string)
     (at ["email"] string)
     
@@ -115,7 +116,7 @@ view model =
   Failure msg -> text ("Something went wrong: "++msg)
   Loading -> text ("Loading")
   Succes greeting -> text ("The greeting was: " ++ greeting)
-  SingleSucces singemp -> text ("singleemp is " ++ singemp.name )
+  SingleSucces singemp -> text ("singleemp is " ++ String.fromInt(singemp.id) ++ singemp.name ++ singemp.email )
 
 
 

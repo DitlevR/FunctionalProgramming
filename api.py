@@ -58,8 +58,6 @@ class Employee(db.Model, SerializerMixin):
                               backref=db.backref('employees', lazy=True))
     departments = db.relationship('Department', backref='employee', lazy=False)
 
-    serialize_only = ('id', 'name', 'email', 'project', 'departments')
-
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
@@ -84,10 +82,10 @@ class Department(db.Model):
 
 
 """class EmployeeData(ma.Schema):
-#    class Meta:
-#        field = ("id", "name", "email")
-#        model = Employee
-#
+    class Meta:
+        field = ("id", "name", "email")
+        model = Employee
+
     em_schema = EmployeeData()
     ems_schema = EmployeeData(many=True)
 
@@ -96,10 +94,9 @@ class Hello(Resource):
     def get(self):
         ems = Employee.query.all()
         return ems_schema.dump(ems)
-
-
-api.add_resource(Hello, '/hello')
 """
+
+#api.add_resource(Hello, '/hello')
 
 
 @app.route('/', methods=['GET'])
