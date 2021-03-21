@@ -3,6 +3,10 @@ from flask_sqlalchemy import SQLAlchemy
 from flaskext.mysql import MySQL
 import yaml
 from flask_restful import Resource, Api, reqparse
+from flask_cors import CORS
+from sqlalchemy_serializer import SerializerMixin
+from sqlalchemy.ext.declarative import DeclarativeMeta
+import json
 
 
 # import pandas as pd
@@ -10,6 +14,7 @@ from flask_restful import Resource, Api, reqparse
 
 
 app = Flask(__name__)
+CORS(app)
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/funk'
@@ -46,13 +51,22 @@ class Project(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
 
+    def __init__(self, name):
+        self.name = name
 
-class Employee(db.Model):
+
+class Employee(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    projects = db.relationship('Project', secondary=projects, lazy='subquery',
-                               backref=db.backref('employees', lazy=True))
+    project = db.relationship('Project', secondary=projects, lazy='subquery',
+                              backref=db.backref('employees', lazy=True))
+    departments = db.relationship('Department', backref='employee', lazy=True)
+
+    serialize_only = ('id', 'name', 'email', 'project', 'departments')
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __init__(self, name, email):
         self.name = name
@@ -66,6 +80,12 @@ class Department(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True, nullable=False)
     description = db.Column(db.String(200), unique=True, nullable=True)
+    employee_id = db.Column(db.Integer, db.ForeignKey('employee.id'),
+                            nullable=False)
+
+    def __init__(self, name, desc):
+        self.name = name
+        self.description = desc
 
 
 @app.route('/', methods=['GET'])
@@ -77,21 +97,32 @@ def home():
 @app.route('/allemployees', methods=['GET'])
 def employees():
     # employee = Employee.query.all()
-    em = Employee.query.first()
-    print(str(em))
-    return "<h1> Our best employee of the year is: " + str(em.name) + "</h1>"
+    all = Employee.query.all()
+    names = []
+    for p in all:
+        names.append(Employee.as_dict(p))
+    return str(names)
 
 
 if __name__ == '__main__':
 
     db.create_all()
-    project = Project("run")
-    db.session.add(project)
-    db.session.commit()
-    # e=Employee("Hans", "hans@mail.dk")
-    # d=Deparment
-
+    # e = Employee("Hans1", "hansa@mail.dk")
+    # p = Project("Clean")
+    # e.project.append(p)
     # db.session.add(e)
+    # e = Employee("Mogens", "Mogens@mmogmaill.dk")
+    # d = Department("HR", "1st floor")
+    # e.departments.append(d)
+    # db.session.add(e)
+
     # db.session.commit()
 
-    app.run()
+
+#
+# d=Deparment
+
+# db.session.add(e)
+# db.session.commit()
+
+app.run()
