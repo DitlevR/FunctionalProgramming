@@ -27,6 +27,8 @@ type Message
 init : () -> (Model, Cmd Message)
 init _ = (Waiting, Cmd.none)
 
+
+
 handleError : Http.Error -> (Model, Cmd Message)
 handleError error =
     case error of
@@ -53,6 +55,8 @@ update message model =
             case result of
                 Ok greeting -> (Succes greeting, Cmd.none)
                 Err error -> handleError error
+
+  
 
 
 getGreeting : Cmd Message
