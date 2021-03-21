@@ -7,6 +7,7 @@ from flask_cors import CORS
 from sqlalchemy_serializer import SerializerMixin
 from sqlalchemy.ext.declarative import DeclarativeMeta
 import json
+from flask_marshmallow import Marshmallow
 
 
 # import pandas as pd
@@ -15,6 +16,8 @@ import json
 
 app = Flask(__name__)
 CORS(app)
+ma = Marshmallow(app)
+api = Api(app)
 
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:password@localhost/funk'
@@ -31,14 +34,6 @@ mysql = MySQL(app)
 
 db = SQLAlchemy(app)
 api = Api(app)
-
-
-class HelloWorld(Resource):
-    def get(self):
-        return {'hello': 'world'}
-
-
-api.add_resource(HelloWorld, '/hello')
 
 
 projects = db.Table('projects',
@@ -61,7 +56,7 @@ class Employee(db.Model, SerializerMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     project = db.relationship('Project', secondary=projects, lazy='subquery',
                               backref=db.backref('employees', lazy=True))
-    departments = db.relationship('Department', backref='employee', lazy=True)
+    departments = db.relationship('Department', backref='employee', lazy=False)
 
     serialize_only = ('id', 'name', 'email', 'project', 'departments')
 
@@ -88,6 +83,24 @@ class Department(db.Model):
         self.description = desc
 
 
+class EmployeeData(ma.Schema):
+    class Meta:
+        field = ("id", "name", "email")
+        model = Employee
+
+    em_schema = EmployeeData()
+    ems_schema = EmployeeData(many=True)
+
+
+class Hello(Resource):
+    def get(self):
+        ems = Employee.query.all()
+        return ems_schema.dump(ems)
+
+
+api.add_resource(Hello, '/hello')
+
+
 @app.route('/', methods=['GET'])
 def home():
 
@@ -98,6 +111,22 @@ def home():
 def employees():
     # employee = Employee.query.all()
     all = Employee.query.all()
+    names = []
+    for p in all:
+        names.append(Employee.as_dict(p))
+    return str(names)
+
+
+@app.route('/employee/<id>', methods=['GET'])
+def employeeById(id):
+    em = Employee.query.filter_by(id=id).first_or_404()
+    return str(Employee.as_dict(em))
+
+
+@app.route('/department/<departmentname>', methods=['GET'])
+def EmInDep(departmentname):
+    all = Employee.query.join(Department).filter(
+        Department.name == departmentname).all()
     names = []
     for p in all:
         names.append(Employee.as_dict(p))
