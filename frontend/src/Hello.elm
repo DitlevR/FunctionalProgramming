@@ -29,8 +29,8 @@ type Model
 
 
 type Message 
- = TryAgainPlease
- | GreetingResult (Result Http.Error String)
+ = Allemp
+ | Allemployees (Result Http.Error String)
  | SingleEmpid (Result Http.Error Employee)
  | GetSingleEmpid
 
@@ -60,12 +60,12 @@ handleError error =
 update : Message -> Model -> (Model, Cmd Message)
 update message model =
  case message of 
-  TryAgainPlease ->
-   (Loading, getGreeting)
+  Allemp ->
+   (Loading, getAllemployees)
 
-  GreetingResult result ->
+  Allemployees result ->
             case result of
-                Ok greeting -> (Succes greeting, Cmd.none)
+                Ok allemployees -> (Succes allemployees, Cmd.none)
                 Err error -> handleError error
 
   GetSingleEmpid ->
@@ -81,14 +81,14 @@ update message model =
 
 
 
-getGreeting : Cmd Message
-getGreeting = Http.get 
+getAllemployees : Cmd Message
+getAllemployees = Http.get 
  {url = "http://localhost:5000/allemployees"
- , expect = Http.expectString GreetingResult
+ , expect = Http.expectString Allemployees
  }
 
 
-getSingleEmp : Cmd Message
+getSingleEmp : Cmd Message 
 getSingleEmp = Http.get
  {url = "http://localhost:5000/employee/1"
  , expect = Http.expectJson SingleEmpid empDecoder
@@ -112,10 +112,10 @@ empDecoder =
 view : Model -> Html Message 
 view model =
  case model of 
-  Waiting -> div [] [button [ onClick TryAgainPlease ] [text "Click for greeting"], button [onClick GetSingleEmpid] [text"get single emp"]]
+  Waiting -> div [] [button [ onClick Allemp ] [text "Click for greeting"], button [onClick GetSingleEmpid] [text"get emp with id 1"]]
   Failure msg -> text ("Something went wrong: "++msg)
   Loading -> text ("Loading")
-  Succes greeting -> text ("The greeting was: " ++ greeting)
+  Succes allemployees -> text ("Allemployees: " ++ allemployees)
   SingleSucces singemp -> text ("singleemp is " ++ String.fromInt(singemp.id) ++ singemp.name ++ singemp.email )
 
 
