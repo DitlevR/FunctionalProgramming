@@ -3,6 +3,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Browser
 import Http 
+import Json.Decode 
 
 main = Browser.element
     { init = init
@@ -11,16 +12,28 @@ main = Browser.element
     , subscriptions = subscriptions
     }
 
+type alias Employee =
+ { name: String
+ , email: String
+ , department: String
+ , project: String
+ }
+
+
+
 type Model 
  = Failure String
  | Waiting
  | Loading 
  | Succes String
+ | SingleSucces String
 
 
 type Message 
  = TryAgainPlease
  | GreetingResult (Result Http.Error String)
+ | SingleEmpid (Result Http.Error String)
+ | GetSingleEmpid
 
 
 
@@ -56,7 +69,17 @@ update message model =
                 Ok greeting -> (Succes greeting, Cmd.none)
                 Err error -> handleError error
 
-  
+  GetSingleEmpid ->
+   (Loading, getSingleEmp)
+
+  SingleEmpid result ->
+   case result of 
+    Ok singemp -> (SingleSucces singemp, Cmd.none)
+    Err error -> handleError error
+
+
+
+
 
 
 getGreeting : Cmd Message
@@ -66,13 +89,28 @@ getGreeting = Http.get
  }
 
 
+getSingleEmp : Cmd Message
+getSingleEmp = Http.get
+ {url = "http://localhost:5000/emp/1"
+ , expect = Http.expectJson SingleEmpid empDecoder
+ }
+
+
+empDecoder : Json.Decode.Decoder String {- Decoder afleverer en decoder der decoder en Employee-}
+empDecoder = 
+ 
+ Json.Decode.field "name" Json.Decode.string
+
+
+
 view : Model -> Html Message 
 view model =
  case model of 
-  Waiting -> button [ onClick TryAgainPlease ] [text "Click for greeting"]
+  Waiting -> div [] [button [ onClick TryAgainPlease ] [text "Click for greeting"], button [onClick GetSingleEmpid] [text"get single emp"]]
   Failure msg -> text ("Something went wrong: "++msg)
   Loading -> text ("Loading")
   Succes greeting -> text ("The greeting was: " ++ greeting)
+  SingleSucces singemp -> text ("singleemp is " ++ singemp)
 
 
 
