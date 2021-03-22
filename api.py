@@ -49,6 +49,9 @@ class Project(db.Model):
     def __init__(self, name):
         self.name = name
 
+        def as_dict(self):
+            return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Employee(db.Model, SerializerMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -79,6 +82,9 @@ class Department(db.Model):
     def __init__(self, name, desc):
         self.name = name
         self.description = desc
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 """class EmployeeData(ma.Schema):
@@ -129,6 +135,15 @@ def EmInDep(departmentname):
     for p in all:
         em = em + json.dumps(p)
     return em
+
+
+@app.route('/department/alldep', methods=['GET'])
+def allDep():
+    all = Department.query.all()
+    allemps = []
+    for p in all:
+        allemps.append(Department.as_dict(p))
+    return str(allemps)
 
 
 if __name__ == '__main__':

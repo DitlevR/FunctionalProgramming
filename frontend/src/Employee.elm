@@ -18,6 +18,8 @@ type alias Employee =
  , email: String
  }
 
+type alias EmployeeList = 
+  { employees : List Employee }
 
 
 type Model 
@@ -85,7 +87,7 @@ getAllemployees : Cmd Message
 getAllemployees = Http.get 
  {url = "http://localhost:5000/allemployees"
  , expect = Http.expectString Allemployees
- }
+ } 
 
 
 getSingleEmp : Cmd Message 
@@ -112,7 +114,7 @@ empDecoder =
 view : Model -> Html Message 
 view model =
  case model of 
-  Waiting -> div [] [button [ onClick Allemp ] [text "Click for greeting"], button [onClick GetSingleEmpid] [text"get emp with id 1"]]
+  Waiting -> div [] [button [ onClick Allemp ] [text "Click for all employees"], button [onClick GetSingleEmpid] [text"get emp with id 1"]]
   Failure msg -> text ("Something went wrong: "++msg)
   Loading -> text ("Loading")
   Succes allemployees -> text ("Allemployees: " ++ allemployees)
