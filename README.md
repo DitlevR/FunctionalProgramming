@@ -29,5 +29,5 @@ Our Elm frontend is not a Single Page application, we could not get it to work. 
 In Employee. elm you can see a single result of employee with the id of 1 or all employees. 
 In Department.elm you can see all departments. 
 Its all a get Http request from our backend.
-We use a Json decoder to decode the json we get from our backend. 
-The layout of the pages are not pretty but we tried our best to just get something to work. 
+We use a Json decoder to decode the json we get from our backend and create tables in the endpoints where we collect all of our data. 
+
