@@ -17,7 +17,12 @@ You will need to insert something in to the employees table. SO connect to your 
 
 " insert into employee (id, name, email) values (1, "john", "john@johnmail.com"); "
 
+To insert data into the department table - execute the following line in your database:
+" insert into department(name, description, employee_id) values("PR", "1st floor", 1); "
+
 go to "localhost:5000/allemployees" to see john
+
+The relations between the tabels is made in python and can be seen on line 60, 62, 79.
 
 This is all we have done at the moment for this api.
 
