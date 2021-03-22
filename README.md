@@ -34,4 +34,4 @@ We use a Json decoder of a single element on the json list to decode the reponse
 
 to insert data into the department table - execute the following line in your database:
 
-insert into department(name, description, employee_id) values("PR", "1st floor", 1);
+"insert into department(name, description, employee_id) values("PR", "1st floor", 1);"
