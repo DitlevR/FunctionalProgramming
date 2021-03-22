@@ -124,7 +124,6 @@ def employees():
 @app.route('/employee/<id>', methods=['GET'])
 def employeeById(id):
     em = Employee.query.filter_by(id=id).first_or_404()
-    print(em)
     return jsonify(Employee.as_dict(em))
 
 
@@ -132,19 +131,19 @@ def employeeById(id):
 def EmInDep(departmentname):
     all = Employee.query.join(Department).filter(
         Department.name == departmentname).all()
-    em = ""
+    alldep = []
     for p in all:
-        em = em + json.dumps(p)
-    return em
+        alldep.append(Department.as_dict(p))
+    return jsonify(alldep)
 
 
 @app.route('/department/alldep', methods=['GET'])
 def allDep():
     all = Department.query.all()
-    allemps = []
+    alldep = []
     for p in all:
-        allemps.append(Department.as_dict(p))
-    return jsonify(allemps)
+        alldep.append(Department.as_dict(p))
+    return jsonify(alldep)
 
 
 if __name__ == '__main__':

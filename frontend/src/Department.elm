@@ -3,7 +3,7 @@ import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Browser
 import Http 
-import Json.Decode exposing (Decoder, string, field, map3, at, int)
+import Json.Decode exposing (Decoder, string, field, map4, at, int, list)
 import Bootstrap.CDN as CDN
 import Bootstrap.Grid as Grid
 
@@ -19,21 +19,27 @@ main = Browser.element
 
 
 type alias Department = 
- {   id: Int
+ {   desc: String 
+   , employee_id: Int
+   , id: Int 
    , name: String
-   , desc: String
  }
+
+
+
+type alias Departmentlist = 
+  { departments : List Department  }
 
 
 type Model
  = Waiting 
  | Loading 
- | Succes String
+ | Succes (List Department)
  | Failure String
 
 
 type Message 
- = GetDepartments (Result Http.Error String)
+ = GetDepartments (Result Http.Error (List Department))
  | Alldep
 
 init : () -> (Model, Cmd Message)
@@ -66,15 +72,63 @@ update message model =
  
   GetDepartments result ->
      case result of 
-     Ok getAllDepartments -> (Succes getAllDepartments, Cmd.none)
+     Ok departments -> (Succes departments, Cmd.none)
      Err error -> handleError error
 
 
 getDepartments: Cmd Message
 getDepartments = Http.get 
  {url = "http://localhost:5000/department/alldep"
- , expect = Http.expectString GetDepartments
+ , expect = Http.expectJson GetDepartments (list depDecoder)
  } 
+
+
+
+depDecoder : Decoder Department 
+depDecoder = 
+  map4 Department
+    (at ["description"] string)
+    (at ["employee_id"] int)
+    (at ["id"] int)
+    (at ["name"] string)
+
+
+
+viewDeparments : List Department -> Html Message
+viewDeparments departments =
+    div []
+        [ h3 [] [ text "All departments" ]
+        , table []
+            ([ viewTableHeader ] ++ List.map viewDepartment departments)
+        ] 
+
+
+viewDepartment : Department -> Html Message
+viewDepartment department =
+    tr []
+        [ td []
+            [ text department.desc ]
+        , td []
+            [ text (String.fromInt department.employee_id) ]
+        , td []
+            [ text (String.fromInt department.id) ]
+        , td []
+            [ text department.name ]
+        ]
+
+viewTableHeader : Html Message
+viewTableHeader =
+    tr []
+        [ th []
+            [ text "Description" ]
+        , th []
+            [ text "Employee_id" ]
+        , th []
+            [ text "Id" ]
+         , th []
+            [ text "name" ]
+        ]
+
 
 
 
@@ -83,7 +137,7 @@ view model =
  case model of 
  Waiting -> Grid.container [] [ button [ onClick Alldep ] [text "Click for all departments"] ]
  Loading -> text ("Jeg loader")
- Succes getAllDepartments -> text ("All deparments " ++ getAllDepartments)
+ Succes departments -> viewDeparments departments 
  Failure msg -> text ("Something went wrong: "++msg)
 
 
