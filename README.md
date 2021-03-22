@@ -27,7 +27,10 @@ This is all we have done at the moment for this api.
 
 Our Elm frontend is not a Single Page application, we could not get it to work. So we made to seperate files. 
 In Employee. elm you can see a single result of employee with the id of 1 or all employees. 
+
 In Department.elm you can see all departments. 
-Its all a get Http request from our backend.
-We use a Json decoder to decode the json we get from our backend and create tables in the endpoints where we collect all of our data. 
+
+The button on the page sends a http get request to the backend and you get the response in a json format.
+
+We use a Json decoder of a single element on the json list to decode the reponse and we then create tables in the endpoints.  
 
