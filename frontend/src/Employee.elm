@@ -1,9 +1,9 @@
-module Hello exposing (..)
+module Employee exposing (..)
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Browser
 import Http 
-import Json.Decode exposing (Decoder, string, field, map3, at, int)
+import Json.Decode exposing (Decoder, string, field, map3, at, int, list)
 
 main = Browser.element
     { init = init
@@ -19,22 +19,26 @@ type alias Employee =
  }
 
 type alias EmployeeList = 
-  { employees : List Employee }
+  { employees : List Employee  }
+
+
 
 
 type Model 
  = Failure String
  | Waiting
  | Loading 
- | Succes String
+ | Succes (List Employee)
  | SingleSucces Employee
 
 
 type Message 
  = Allemp
- | Allemployees (Result Http.Error String)
+ | Allemployees (Result Http.Error (List Employee))
  | SingleEmpid (Result Http.Error Employee)
  | GetSingleEmpid
+
+
 
 
 
@@ -67,7 +71,7 @@ update message model =
 
   Allemployees result ->
             case result of
-                Ok allemployees -> (Succes allemployees, Cmd.none)
+                Ok employees -> (Succes employees, Cmd.none)
                 Err error -> handleError error
 
   GetSingleEmpid ->
@@ -86,7 +90,7 @@ update message model =
 getAllemployees : Cmd Message
 getAllemployees = Http.get 
  {url = "http://localhost:5000/allemployees"
- , expect = Http.expectString Allemployees
+ , expect = Http.expectJson Allemployees (list empDecoder)
  } 
 
 
@@ -103,11 +107,39 @@ empDecoder =
     (at ["id"] int)
     (at ["name"] string)
     (at ["email"] string)
-    
 
- 
- 
- 
+
+
+viewEmployees : List Employee -> Html Message
+viewEmployees employees =
+    div []
+        [ h3 [] [ text "Allemp" ]
+        , table []
+            ([ viewTableHeader ] ++ List.map viewEmployee employees)
+        ]
+
+
+viewEmployee : Employee -> Html Message
+viewEmployee employee =
+    tr []
+        [ td []
+            [ text (String.fromInt employee.id) ]
+        , td []
+            [ text employee.name ]
+        , td []
+            [ text employee.email ]
+        ]
+
+viewTableHeader : Html Message
+viewTableHeader =
+    tr []
+        [ th []
+            [ text "ID" ]
+        , th []
+            [ text "Name" ]
+        , th []
+            [ text "Email" ]
+        ]
 
 
 
@@ -117,7 +149,8 @@ view model =
   Waiting -> div [] [button [ onClick Allemp ] [text "Click for all employees"], button [onClick GetSingleEmpid] [text"get emp with id 1"]]
   Failure msg -> text ("Something went wrong: "++msg)
   Loading -> text ("Loading")
-  Succes allemployees -> text ("Allemployees: " ++ allemployees)
+  Succes employees -> viewEmployees employees
+
   SingleSucces singemp -> text ("singleemp is " ++ String.fromInt(singemp.id) ++ singemp.name ++ singemp.email )
 
 

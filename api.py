@@ -102,7 +102,7 @@ class Hello(Resource):
         return ems_schema.dump(ems)
 """
 
-#api.add_resource(Hello, '/hello')
+# api.add_resource(Hello, '/hello')
 
 
 @app.route('/', methods=['GET'])
@@ -118,13 +118,14 @@ def employees():
     names = []
     for p in all:
         names.append(Employee.as_dict(p))
-    return str(names)
+    return jsonify(names)
 
 
 @app.route('/employee/<id>', methods=['GET'])
 def employeeById(id):
     em = Employee.query.filter_by(id=id).first_or_404()
-    return json.dumps(Employee.as_dict(em))
+    print(em)
+    return jsonify(Employee.as_dict(em))
 
 
 @app.route('/department/<departmentname>', methods=['GET'])
@@ -143,7 +144,7 @@ def allDep():
     allemps = []
     for p in all:
         allemps.append(Department.as_dict(p))
-    return str(allemps)
+    return jsonify(allemps)
 
 
 if __name__ == '__main__':
