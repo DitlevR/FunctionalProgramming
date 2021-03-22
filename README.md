@@ -22,3 +22,12 @@ go to "localhost:5000/allemployees" to see john
 
 This is all we have done at the moment for this api. 
 
+
+# The elm Frontend
+
+Our Elm frontend is not a Single Page application, we could not get it to work. So we made to seperate files. 
+In Employee. elm you can see a single result of employee with the id of 1 or all employees. 
+In Department.elm you can see all departments. 
+Its all a get Http request from our backend.
+We use a Json decoder to decode the json we get from our backend. 
+The layout of the pages are not pretty but we tried our best to just get something to work. 
