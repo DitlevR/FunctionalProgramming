@@ -6,5 +6,6 @@
 env/
 venv/
 
+/haskell-new/package.yaml
 
 db.yaml
