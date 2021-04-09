@@ -96,7 +96,7 @@ getAllemployees = Http.get
 
 getSingleEmp : Cmd Message 
 getSingleEmp = Http.get
- {url = "http://localhost:5000/employee/1"
+ {url = "http://localhost:4711/em1"
  , expect = Http.expectJson SingleEmpid empDecoder
  }
 
